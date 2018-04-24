@@ -27,7 +27,7 @@
                 .field
                   .control
                     .select
-                      select(v-model="pago.mes")
+                      select(v-model="pago.mes" :disabled="!pago.new")
                         option Enero
                         option Febrero
                         option Marzo
@@ -47,10 +47,10 @@
               .field-body
                 .field
                   .control
-                    input.input(type="text", v-model="pago.monto" placeholder="Monto - Descripcion")
+                    input.input(type="text", v-model="pago.monto" placeholder="Monto - Descripcion" :disabled="!pago.new")
                 .field
                   .control
-                    input.input(type="date", v-model="pago.dia" placeholder="Dia")
+                    input.input(type="date", v-model="pago.dia" placeholder="Dia" :disabled="!pago.new")
     div(v-if="show")
       button(@click.prevent="addRow") +
     div(v-if="show")
@@ -64,6 +64,7 @@ const db = firebase.database()
 export default {
   data () {
     return {
+      disable: true,
       player: {},
       isPaginated: true,
       isPaginationSimple: false,
@@ -91,10 +92,13 @@ export default {
       let id = this.$route.params.id
       db.ref(`jugadores/${id}`).once('value').then((snapshot) => {
         this.player = snapshot.val()
+        this.player.pagos.forEach(e => {
+          e.new = false
+        })
       })
     },
     addRow () {
-      this.player.pagos.push({})
+      this.player.pagos.push({mes: null, monto: null, dia: null, new: true})
       this.one += 1
       if (this.one !== 1) {
         this.showlastremove = true
@@ -110,6 +114,9 @@ export default {
     addPay () {
       let id = this.$route.params.id
       db.ref(`jugadores/${id}/pagos`).set(this.player.pagos)
+      this.player.pagos.forEach(e => {
+        e.new = false
+      })
       this.showModal = true
       this.show = !this.show
       this.newpay = !this.newpay
@@ -118,7 +125,7 @@ export default {
       this.show = !this.show
       this.newpay = !this.newpay
       this.sendpay = !this.sendpay
-      this.player.pagos.push({})
+      this.player.pagos.push({mes: null, monto: null, dia: null, new: true})
       this.one = this.player.pagos.length
     }
   }

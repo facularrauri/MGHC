@@ -19,7 +19,7 @@
             .field-body
               .field
                 .control
-                  input.input(:class="[!name ? 'is-danger' : '']", type="text", v-model="newEntry.nombre" placeholder="Nombre")
+                  input.input(:class="[!name ? 'is-danger' : '']", type="text", v-model="newEntry.nombre" placeholder="Nombre" value="1")
                   p(v-if="!name" class="danger") {{noName}}
               .field
                 .control
@@ -29,9 +29,7 @@
             .field-body
               .field
                 .control
-                  input.input(:class="[!sociob ? 'is-danger' : repeatedS ? 'is-danger' : '']", type="number", v-model="newEntry.socio" placeholder="Numero de socio")
-                  p(v-if="!sociob" class="danger") {{noSocio}}
-                  p(v-if="repeatedS" class="danger") {{repeatedSocio}}
+                  input.input(type="number", v-model="newEntry.socio" placeholder="Numero de socio" disabled)
           label.label Tira
           .field.is-horizontal
             .field-body
@@ -133,7 +131,6 @@
 import firebase from '@/firebase'
 
 const db = firebase.database()
-
 export default {
   name: 'EntryCreate',
 
@@ -153,12 +150,10 @@ export default {
       name: true,
       email: true,
       lastname: true,
-      sociob: true,
-      repeatedS: false,
       errors: [],
       pagos: true,
       campos: false,
-      showlastremove: true,
+      showlastremove: false,
       one: 0,
       tira: false,
       categoria: false,
@@ -170,6 +165,15 @@ export default {
   },
   created () {
     this.Players()
+    db.ref('jugadores').orderByChild('socio').limitToLast(1).on('child_added', (data) => {
+      console.log(data.val())
+      this.newEntry.socio = (parseInt(data.val().socio) + 1).toString()
+    })
+  },
+  beforeUpdate () {
+    db.ref('jugadores').orderByChild('socio').limitToLast(1).on('child_added', (data) => {
+      this.newEntry.socio = (parseInt(data.val().socio) + 1).toString()
+    })
   },
   methods: {
     addEntry () {
@@ -206,17 +210,6 @@ export default {
         this.email = false
         this.errors.push('error')
       }
-      if (!this.newEntry.socio) {
-        this.sociob = false
-        this.errors.push('error')
-      }
-      db.ref('jugadores').orderByChild('socio').equalTo(this.newEntry.socio).on('child_added', (data) => {
-        this.socio = data.key
-      })
-      if (this.socio === this.newEntry.socio) {
-        this.repeatedS = true
-        this.errors.push('error')
-      }
       if (!this.newEntry.pagos.length) {
         this.pagos = false
         this.errors.push('error')
@@ -248,8 +241,8 @@ export default {
       this.newEntry = {
         nombre: null,
         apellido: null,
-        pagos: [],
         socio: null,
+        pagos: [],
         email: null,
         tira: null,
         categoria: null
@@ -259,7 +252,7 @@ export default {
       this.newEntry.pagos.push({mes: null, monto: null, dia: null})
       this.pagos = true
       this.one += 1
-      if (this.one === 1) {
+      if (this.one === 0) {
         this.showlastremove = false
       } else {
         this.showlastremove = true
@@ -268,7 +261,7 @@ export default {
     removeRow (i) {
       this.newEntry.pagos.splice(i, 1)
       this.one -= 1
-      if (this.one === 1) {
+      if (this.one === 0) {
         this.showlastremove = false
       } else {
         this.showlastremove = true
@@ -290,14 +283,8 @@ export default {
     noLastName () {
       if (!this.lastname) return 'Debe ingresar un apellido'
     },
-    noSocio () {
-      if (!this.sociob) return 'Debe ingresar un numero de socio'
-    },
     invalidEmail () {
       if (!this.email) return 'El formato del email no es correcto'
-    },
-    repeatedSocio () {
-      if (this.repeatedS) return 'El numero de socio ya existe'
     },
     Invalidpago () {
       if (!this.pagos) return 'Debe ingresar un pago'
