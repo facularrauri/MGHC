@@ -166,13 +166,12 @@ export default {
   created () {
     this.Players()
     db.ref('jugadores').orderByChild('socio').limitToLast(1).on('child_added', (data) => {
-      console.log(data.val())
-      this.newEntry.socio = (parseInt(data.val().socio) + 1).toString()
+      this.newEntry.socio = (parseInt(data.val().socio) + 1)
     })
   },
   beforeUpdate () {
     db.ref('jugadores').orderByChild('socio').limitToLast(1).on('child_added', (data) => {
-      this.newEntry.socio = (parseInt(data.val().socio) + 1).toString()
+      this.newEntry.socio = (parseInt(data.val().socio) + 1)
     })
   },
   methods: {

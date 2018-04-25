@@ -5,7 +5,7 @@
       .modal-content
         .notification.has-text-centered
            button.delete(@click="showModal = !showModal")
-           p Los datos de <strong>{{player.nombre.charAt(0).toUpperCase() + player.nombre.slice(1)}} {{player.apellido.charAt(0).toUpperCase() + player.apellido.slice(1)}}</strong> se han actualizado.
+           p Los datos de <strong>{{nombre.charAt(0).toUpperCase() + nombre.slice(1)}} {{apellido.charAt(0).toUpperCase() + apellido.slice(1)}}</strong> se han actualizado.
     .columns.is-mobile
       .column.is-4.is-offset-4
           h1 {{nombre.charAt(0).toUpperCase() + nombre.slice(1)}} {{apellido.charAt(0).toUpperCase() + apellido.slice(1)}}
@@ -112,6 +112,9 @@ export default {
       }
     },
     addPay () {
+      this.player.pagos.forEach(e => {
+        delete e.new
+      })
       let id = this.$route.params.id
       db.ref(`jugadores/${id}/pagos`).set(this.player.pagos)
       this.player.pagos.forEach(e => {
