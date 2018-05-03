@@ -22,13 +22,7 @@ export default {
   components: {
     BarChart
   },
-  created () {
-    db.ref('jugadores').on('child_added', (data) => {
-      console.log(data.val())
-    })
-  },
   mounted () {
-    this.getAllPlayers()
     this.months.forEach(e => { e = 0 })
     db.ref('jugadores').once('value')
       .then(data => {
@@ -64,15 +58,6 @@ export default {
           }
         ]
       }
-    },
-    getAllPlayers () {
-      db.ref('jugadores').once('value').then((snapshot) => {
-        this.players = snapshot.val()
-        // this.players.forEach((e, i) => {
-        //   e.pagos.push({})
-        //   db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-        // })
-      })
     }
   }
 }

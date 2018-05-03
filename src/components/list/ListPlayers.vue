@@ -108,7 +108,7 @@ export default {
       this.isSwitched = !this.isSwitched
     },
     edit (i) {
-      this.$router.push({ path: `/entry/update/${i}` })
+      this.$router.push({ path: `/entry/create/${i}` })
     },
     pays (i) {
       this.$router.push({path: `/pay/${i}`})

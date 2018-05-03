@@ -19,7 +19,7 @@
             .field-body
               .field
                 .control
-                  input.input(:class="[!name ? 'is-danger' : '']", type="text", v-model="newEntry.nombre" placeholder="Nombre" value="1")
+                  input.input(:class="[!name ? 'is-danger' : '']", type="text", v-model="newEntry.nombre" placeholder="Nombre")
                   p(v-if="!name" class="danger") {{noName}}
               .field
                 .control
@@ -30,16 +30,6 @@
               .field
                 .control
                   input.input(type="number", v-model="newEntry.socio" placeholder="Numero de socio" disabled)
-          label.label Tira
-          .field.is-horizontal
-            .field-body
-              .field
-                .control
-                  .select
-                    select(:class="[tira ? 'selectdanger' : '']", v-model="newEntry.tira")
-                      option Damas
-                      option Caballeros
-                p(v-if="tira" class="danger") {{InvalidTira}}
           label.label Categoria
           .field.is-horizontal
             .field-body
@@ -47,16 +37,26 @@
                 .control
                   .select
                     select(:class="[categoria ? 'selectdanger' : '']", v-model="newEntry.categoria")
-                      option Mayores
-                      option Quinta
-                      option Sexta
-                      option Septima
-                      option Octava
-                      option Novena
-                      option Decima
+                      option Activo Mayor (+18)
+                      option Activo Cadete (14-17)
+                      option Menor (-13)
+                      option Vitalicio
+                      option Honorario
+                      option Licencia
                 p(v-if="categoria" class="danger") {{InvalidCategoria}}
+          .field.is-horizontal(v-if="newEntry.categoria === 'Licencia'")
+            .field-body
+              .field
+                .control
+                  label.label Inicio de Licencia
+                  input.input(type="date", v-model="newEntry.licenciainicio" placeholder="Inicio de Licencia")
+              .field
+                .control
+                  label.label Fin de Licencia
+                  input.input(type="date", v-model="newEntry.licenciafin" placeholder="Fin de Licencia")
+
           .field
-           label.label Informacion
+          label.label Datos Personales
           .field.is-horizontal
             .field-body
               .field
@@ -84,41 +84,179 @@
               .field
                 .control
                   input.input(type="tel", v-model="newEntry.celularmadre" placeholder="Telefono Padre")
-          label.label Pagos
-          p(v-if="!pagos" class="danger") {{Invalidpago}}
-          .field(v-for="(pago,i) in newEntry.pagos" :key="i")
-            .field
+          .field
+          .field.is-horizontal
+            .field-body
+              .field
+                .control
+                  input.input(type="text", v-model="newEntry.direccion" placeholder="Direccion")
+              .field
+                .control
+                  input.input(:class="[!nacimiento ? 'is-danger' : '']", type="text", v-model="newEntry.nacimiento" placeholder="Fecha de Nacimiento")
+                  p(v-if="!nacimiento" class="danger") {{noNacimiento}}
+          .field.is-horizontal
+            .field-body
+              .field
+                label.label Fecha de Alta
+                .control
+                  input.input(:class="[!alta ? 'is-danger' : '']", type="date", v-model="newEntry.alta" placeholder="Fecha de Alta")
+                  p(v-if="!alta" class="danger") {{noFechaAlta}}
+              .field
+                .control
+                  label.label Fecha de baja
+                  input.input(type="date" v-model="newEntry.baja" placeholder="Fecha de Baja")
+          label.label Corbertura Medica
+          .field
+          .field.is-horizontal
+            .field-body
+              .field
+                .control
+                  input.input(type="text", v-model="newEntry.obrasocial" placeholder="Obral Social")
+              .field
+                .control
+                  input.input(type="text", v-model="newEntry.nobrasocial" placeholder="Numero de Socio")
+
+          label.label Actividades
+          .field.is-horizontal
+            .field-body
+              .field
+                .control
+                  .select
+                    select(:class="[!actividad ? 'selectdanger' : '']", v-model="newEntry.actividad")
+                      option Hockey
+                      option Futbol
+                      option Sin Actividad
+                  p(v-if="!actividad" class="danger") {{noActividad}}
+
+          .field(v-if="newEntry.actividad === 'Hockey'")
             .field.is-horizontal
               .field-body
                 .field
                   .control
+                    label.label Tira
                     .select
-                      select(:class="[mes ? 'selectdanger' : '']", v-model="pago.mes")
-                        option Enero
-                        option Febrero
-                        option Marzo
-                        option Abril
-                        option Mayo
-                        option Junio
-                        option Julio
-                        option Agosto
-                        option Septiembre
-                        option Octubre
-                        option Noviembre
-                        option Diciembre
-                        option Otro
-                    button(v-if="showlastremove" @click.prevent="removeRow(i)") -
-            .field
+                      select(:class="[tira ? 'selectdanger' : '']", v-model="newEntry.tira")
+                        option Damas
+                        option Caballeros
+                    p(v-if="tira" class="danger") {{InvalidTira}}
+                .field
+                  .control
+                    label.label Categoria
+                    .select
+                      select(:class="[categoria ? 'selectdanger' : '']", v-model="newEntry.categoriah")
+                        option Mayores
+                        option Quinta
+                        option Sexta
+                        option Septima
+                        option Octava
+                        option Novena
+                        option Decima
+                        option Escuelita
+                  p(v-if="categoria" class="danger") {{InvalidCategoria}}
+
             .field.is-horizontal
               .field-body
                 .field
                   .control
-                    input.input(:class="[monto ? 'is-danger' : '']", type="text", v-model="pago.monto" placeholder="Monto - Descripcion")
+                    input.input(type="number", v-model="newEntry.fichaje" placeholder="Numero de Fichaje")
                 .field
                   .control
-                    input.input(:class="[dia ? 'is-danger' : '']" ,type="date", v-model="pago.dia" placeholder="Dia")
-            p(v-if="campos" class="danger") {{InvalidCampos}}
-          button(@click.prevent="addRow") +
+                    input.input(type="number", v-model="newEntry.camisetah" placeholder="Numero de Camiseta")
+                .field
+                  .control
+                    input.input(type="number", v-model="newEntry.beca" placeholder="Beca %")
+            .field.is-horizontal
+                .field-body
+                  .field
+                    .control
+                      label.label Fecha de Alta
+                      input.input(:class="[!alta ? 'is-danger' : '']", type="date", v-model="newEntry.altahockey" placeholder="Fecha de Alta")
+                      p(v-if="!alta" class="danger") {{noFechaAlta}}
+                  .field
+                    .control
+                      label.label Fecha de Baja
+                      input.input(type="date", v-model="newEntry.bajahockey" placeholder="Fecha de Baja")
+
+          .field(v-if="newEntry.actividad === 'Futbol'")
+            .field.is-horizontal
+              .field-body
+                .field
+                  .control
+                    label.label Categoria
+                    .select
+                      select(:class="[categoria ? 'selectdanger' : '']", v-model="newEntry.categoriaf")
+                        option Sub15
+                        option Sub11
+                        option Sub9
+                        option Jardin
+                    p(v-if="categoria" class="danger") {{InvalidCategoria}}
+            .field.is-horizontal
+              .field-body
+                .field
+                  .control
+                    input.input(type="number", v-model="newEntry.camisetaf" placeholder="Numero de camiseta")
+                .field
+                  .control
+                    input.input(type="number", v-model="newEntry.becaf" placeholder="Beca %")
+            .field.is-horizontal
+                .field-body
+                  .field
+                    .control
+                      label.label Fecha de Alta
+                      input.input(type="date", v-model="newEntry.altafutbol" placeholder="Fecha de Alta")
+                  .field
+                    .control
+                      label.label Fecha de Baja
+                      input.input(type="date", v-model="newEntry.bajafutbol" placeholder="Fecha de Baja")
+          .field(v-if="!update")
+            label.label Pagos
+            p(v-if="!pagos" class="danger") {{Invalidpago}}
+            .field(v-for="(pago,i) in newEntry.pagos" :key="i")
+              .field
+              .field.is-horizontal
+                .field-body
+                  .field
+                    .control
+                      .select
+                        select(:class="[mes ? 'selectdanger' : '']", v-model="pago.mes")
+                          option Enero
+                          option Febrero
+                          option Marzo
+                          option Abril
+                          option Mayo
+                          option Junio
+                          option Julio
+                          option Agosto
+                          option Septiembre
+                          option Octubre
+                          option Noviembre
+                          option Diciembre
+                          option Otro
+                      button(v-if="showlastremove" @click.prevent="removeRow(i)") -
+              .field
+              .field.is-horizontal
+                .field-body
+                  .field
+                    .control
+                      label.label Credito
+                      input.input(:class="[monto ? 'is-danger' : '']", type="number", v-model="pago.monto" placeholder="Credito")
+                  .field
+                    .control
+                      label.label Fecha
+                      input.input(:class="[dia ? 'is-danger' : '']" ,type="date", v-model="pago.dia" placeholder="Dia")
+              .field
+              .field.is-horizontal
+                .field-body
+                  .field
+                    .control
+                      label.label Descripcion
+                      input.input(:class="[desc ? 'is-danger' : '']", type="text" placeholder="Descripcion" v-model="pago.descripcion")
+                  .field
+                    .control
+                      label.label Numero de recibo
+                      input.input(type="text" placeholder="Numero de recibo" v-model="pago.recibo" disabled)
+              p(v-if="campos" class="danger") {{InvalidCampos}}
+            button(@click.prevent="addRow") +
           .field.is-horizontal
             .field-label.is-normal
               .field-body
@@ -137,15 +275,10 @@ export default {
   data () {
     return {
       newEntry: {
-        nombre: null,
-        apellido: null,
         pagos: [],
-        socio: null,
-        email: null,
-        tira: null,
-        categoria: null
+        nombre: null,
+        apellido: null
       },
-      isLoading: false,
       socio: '',
       name: true,
       email: true,
@@ -160,13 +293,24 @@ export default {
       mes: false,
       monto: false,
       dia: false,
-      showModal: false
+      showModal: false,
+      nacimiento: true,
+      alta: true,
+      actividad: true,
+      recibo: null,
+      desc: false,
+      update: false
     }
   },
-  created () {
+  mounted () {
     this.Players()
+  },
+  created () {
     db.ref('jugadores').orderByChild('socio').limitToLast(1).on('child_added', (data) => {
       this.newEntry.socio = (parseInt(data.val().socio) + 1)
+    })
+    db.ref('recibo').once('value').then((snapshot) => {
+      this.recibo = snapshot.val() + 1
     })
   },
   beforeUpdate () {
@@ -176,12 +320,14 @@ export default {
   },
   methods: {
     addEntry () {
+      this.desc = false
+      this.actividad = true
+      this.nacimiento = true
+      this.alta = true
       this.errors = []
       this.name = true
       this.lastname = true
       this.email = true
-      this.sociob = true
-      this.repeatedS = false
       this.pagos = true
       this.campos = false
       this.tira = false
@@ -189,6 +335,18 @@ export default {
       this.mes = false
       this.dia = false
       this.monto = false
+      if (!this.newEntry.actividad) {
+        this.actividad = false
+        this.errors.push('Error falta actividad')
+      }
+      if (!this.newEntry.alta) {
+        this.alta = false
+        this.errors.push('Error fecha de alta')
+      }
+      if (!this.newEntry.nacimiento) {
+        this.nacimiento = false
+        this.errors.push('Error nacimiento')
+      }
       if (!this.newEntry.tira) {
         this.tira = true
         this.errors.push('error')
@@ -209,25 +367,24 @@ export default {
         this.email = false
         this.errors.push('error')
       }
+
       if (!this.newEntry.pagos.length) {
         this.pagos = false
         this.errors.push('error')
-      } else if (!this.newEntry.pagos[0].mes || !this.newEntry.pagos[0].monto || !this.newEntry.pagos[0].dia) {
+      } else if (!this.newEntry.pagos[0].descripcion || !this.newEntry.pagos[0].mes || !this.newEntry.pagos[0].monto || !this.newEntry.pagos[0].dia) {
         this.campos = true
         this.errors.push('error')
       }
-      if (!this.newEntry.pagos[0].mes) {
-        this.mes = true
-      }
-      if (!this.newEntry.pagos[0].monto) {
-        this.monto = true
-      }
-      if (!this.newEntry.pagos[0].dia) {
-        this.dia = true
-      }
+
+      if (!this.newEntry.pagos[0].mes) this.mes = true
+      if (!this.newEntry.pagos[0].monto) this.monto = true
+      if (!this.newEntry.pagos[0].dia) this.dia = true
+      if (!this.newEntry.pagos[0].descripcion) this.desc = true
+
       if (!this.errors.length) {
         db.ref(`jugadores/${this.newEntry.socio}`).set(this.newEntry)
         db.ref(`jugadores/${this.newEntry.socio}/pagos`).set(this.newEntry.pagos)
+        db.ref('recibo').set(this.recibo)
         this.showModal = true
       }
     },
@@ -240,15 +397,12 @@ export default {
       this.newEntry = {
         nombre: null,
         apellido: null,
-        socio: null,
-        pagos: [],
-        email: null,
-        tira: null,
-        categoria: null
+        pagos: []
       }
     },
     addRow () {
-      this.newEntry.pagos.push({mes: null, monto: null, dia: null})
+      this.newEntry.pagos.push({mes: null, monto: 0, dia: null, debito: 0, recibo: this.recibo})
+      this.recibo += 1
       this.pagos = true
       this.one += 1
       if (this.one === 0) {
@@ -259,6 +413,7 @@ export default {
     },
     removeRow (i) {
       this.newEntry.pagos.splice(i, 1)
+      this.recibo -= 1
       this.one -= 1
       if (this.one === 0) {
         this.showlastremove = false
@@ -268,14 +423,26 @@ export default {
     },
     Players () {
       if (this.$route.params.id !== 'new') {
+        this.update = true
         let id = this.$route.params.id
         db.ref(`jugadores/${id}`).once('value').then((snapshot) => {
           this.newEntry = snapshot.val()
         })
+      } else {
+        this.update = false
       }
     }
   },
   computed: {
+    noActividad () {
+      if (!this.actividad) return 'Debe ingresar una actividad'
+    },
+    noFechaAlta () {
+      if (!this.alta) return 'Debe ingresar fecha de alta'
+    },
+    noNacimiento () {
+      if (!this.nacimiento) return 'Debe ingresar fecha de nacimiento'
+    },
     noName () {
       if (!this.name) return 'Debe ingresar un nombre'
     },
