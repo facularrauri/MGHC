@@ -303,15 +303,12 @@ export default {
     }
   },
   mounted () {
-    this.Players()
+    // this.Players()
   },
   created () {
+    this.Players()
     db.ref('jugadores').orderByChild('socio').limitToLast(1).on('child_added', (data) => {
-      if (this.$route.params.id === 'new') {
-        this.newEntry.socio = (parseInt(data.val().socio) + 1)
-      } else {
-        this.newEntry.socio = parseInt(data.val().socio)
-      }
+      this.newEntry.socio = (parseInt(data.val().socio) + 1)
     })
     db.ref('recibo').once('value').then((snapshot) => {
       this.recibo = snapshot.val() + 1
@@ -320,13 +317,9 @@ export default {
   beforeUpdate () {
     db.ref('jugadores').orderByChild('socio').limitToLast(1).on('child_added', (data) => {
       if (this.$route.params.id === 'new') {
-        this.newEntry = {
-          pagos: [],
-          nombre: null,
-          apellido: null,
-          socio: (parseInt(data.val().socio) + 1)
-        }
         this.update = false
+        // this.newEntry = {}
+        this.newEntry.socio = (parseInt(data.val().socio) + 1)
       } else {
         this.newEntry.socio = parseInt(data.val().socio)
       }

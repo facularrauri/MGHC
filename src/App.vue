@@ -33,14 +33,14 @@ export default {
     if (month === 12) this.month = 'Diciembre'
   },
   mounted () {
-    if (new Date().getDate() === 29) this.executed = false
+    if (new Date().getDate() === 3) this.executed = false
     this.getAllPlayers()
   },
   methods: {
     getAllPlayers () {
       db.ref('jugadores').once('value').then((snapshot) => {
         this.players = snapshot.val()
-        if (new Date().getDate() === 30 && this.executed === false) {
+        if (new Date().getDate() === 4 && this.executed === false) {
           this.players.forEach((e, i) => {
             if (e.categoria === 'Activo Mayor (+18)' && e.actividad === 'Sin Actividad') {
               e.pagos.push({debito: -1000, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
