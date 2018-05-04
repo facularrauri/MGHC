@@ -143,7 +143,7 @@
                   .control
                     label.label Categoria
                     .select
-                      select(:class="[categoria ? 'selectdanger' : '']", v-model="newEntry.categoriah")
+                      select(:class="[categoriah ? 'selectdanger' : '']", v-model="newEntry.categoriah")
                         option Mayores
                         option Quinta
                         option Sexta
@@ -152,7 +152,7 @@
                         option Novena
                         option Decima
                         option Escuelita
-                  p(v-if="categoria" class="danger") {{InvalidCategoria}}
+                  p(v-if="categoriah" class="danger") {{InvalidCategoria}}
 
             .field.is-horizontal
               .field-body
@@ -184,12 +184,12 @@
                   .control
                     label.label Categoria
                     .select
-                      select(:class="[categoria ? 'selectdanger' : '']", v-model="newEntry.categoriaf")
+                      select(:class="[!categoriaf ? 'selectdanger' : '']", v-model="newEntry.categoriaf")
                         option Sub15
                         option Sub11
                         option Sub9
                         option Jardin
-                    p(v-if="categoria" class="danger") {{InvalidCategoria}}
+                    p(v-if="!categoriaf" class="danger") {{InvalidCategoria}}
             .field.is-horizontal
               .field-body
                 .field
@@ -299,11 +299,10 @@ export default {
       actividad: true,
       recibo: null,
       desc: false,
-      update: false
+      update: false,
+      categoriah: false,
+      categoriaf: false
     }
-  },
-  mounted () {
-    // this.Players()
   },
   created () {
     this.Players()
@@ -314,16 +313,17 @@ export default {
       this.recibo = snapshot.val() + 1
     })
   },
-  beforeUpdate () {
+  beforeRouteUpdate (to, from, next) {
     db.ref('jugadores').orderByChild('socio').limitToLast(1).on('child_added', (data) => {
-      if (this.$route.params.id === 'new') {
-        this.update = false
-        // this.newEntry = {}
-        this.newEntry.socio = (parseInt(data.val().socio) + 1)
-      } else {
-        this.newEntry.socio = parseInt(data.val().socio)
+      this.newEntry = {
+        pagos: [],
+        nombre: null,
+        apellido: null,
+        socio: (parseInt(data.val().socio) + 1)
       }
+      this.update = false
     })
+    next()
   },
   methods: {
     addEntry () {
@@ -342,6 +342,8 @@ export default {
       this.mes = false
       this.dia = false
       this.monto = false
+      this.categoriah = false
+      this.categoriaf = false
       if (!this.newEntry.actividad) {
         this.actividad = false
         this.errors.push('Error falta actividad')
@@ -354,33 +356,43 @@ export default {
         this.nacimiento = false
         this.errors.push('Error nacimiento')
       }
-      if (!this.newEntry.tira) {
+      if (this.newEntry.actividad === 'Hockey' && !this.newEntry.tira) {
         this.tira = true
         this.errors.push('error')
       }
+      if (this.newEntry.actividad === 'Hockey' && !this.newEntry.categoriah) {
+        this.categoriah = true
+        this.errors.push('error categoria hockey')
+      }
+      if (this.newEntry.actividad === 'Futbol' && !this.newEntry.categoriaf) {
+        this.categoriaf = true
+        this.errors.push('error categoria futbol')
+      }
       if (!this.newEntry.categoria) {
         this.categoria = true
-        this.errors.push('error')
+        this.errors.push('error categoria')
       }
       if (!this.newEntry.nombre) {
         this.name = false
-        this.errors.push('error')
+        this.errors.push('error nombre')
       }
       if (!this.newEntry.apellido) {
         this.lastname = false
-        this.errors.push('error')
+        this.errors.push('error apellido')
       }
-      if (this.newEntry.email !== null && !this.validEmail(this.newEntry.email)) {
+      if (this.newEntry.email === undefined || this.newEntry.email === '') {
+        this.email = true
+      } else if (!this.validEmail(this.newEntry.email)) {
         this.email = false
-        this.errors.push('error')
+        this.errors.push('Error validacion de mail')
       }
 
       if (!this.newEntry.pagos.length) {
         this.pagos = false
-        this.errors.push('error')
+        this.errors.push('error falta pago')
       } else if (!this.newEntry.pagos[0].descripcion || !this.newEntry.pagos[0].mes || !this.newEntry.pagos[0].monto || !this.newEntry.pagos[0].dia) {
         this.campos = true
-        this.errors.push('error')
+        this.errors.push('error completar campos de pago')
       }
 
       if (!this.newEntry.pagos[0].mes) this.mes = true
@@ -400,11 +412,15 @@ export default {
       return re.test(email)
     },
     toggleModal () {
-      this.showModal = !this.showModal
-      this.newEntry = {
-        nombre: null,
-        apellido: null,
-        pagos: []
+      if (this.$route.params.id === 'new') {
+        this.showModal = !this.showModal
+        this.newEntry = {
+          nombre: null,
+          apellido: null,
+          pagos: []
+        }
+      } else {
+        this.showModal = !this.showModal
       }
     },
     addRow () {

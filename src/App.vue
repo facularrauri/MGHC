@@ -13,8 +13,8 @@ export default {
     return {
       executed: true,
       players: [],
-      date: new Date().toLocaleString().split(' ')[0],
-      month: 'Enero'
+      date: new Date().toISOString().split('T')[0],
+      month: ''
     }
   },
   created () {
@@ -33,167 +33,173 @@ export default {
     if (month === 12) this.month = 'Diciembre'
   },
   mounted () {
-    if (new Date().getDate() === 3) this.executed = false
+    setInterval(() => {
+      console.log('hola desde mounted')
+      if (new Date().getDate() === 4 && new Date().getMinutes() === 52 && new Date().getHours() === 16) this.executed = false
+    }, 30000)
     this.getAllPlayers()
   },
   methods: {
     getAllPlayers () {
       db.ref('jugadores').once('value').then((snapshot) => {
         this.players = snapshot.val()
-        if (new Date().getDate() === 4 && this.executed === false) {
-          this.players.forEach((e, i) => {
-            if (e.categoria === 'Activo Mayor (+18)' && e.actividad === 'Sin Actividad') {
-              e.pagos.push({debito: -1000, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-              db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-            }
-
-            if (e.categoria === 'Activo Cadete (14-17)' && e.actividad === 'Sin Actividad') {
-              e.pagos.push({debito: -1000, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-              db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-            }
-
-            if (e.categoria === 'Menor (-13)' && e.actividad === 'Sin Actividad') {
-              e.pagos.push({debito: -1000, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-              db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-            }
-
-            if (e.actividad === 'Hockey') {
-              if (e.categoriah === 'Mayores' && e.beca !== undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
-                }
-                e.pagos.push({debito: (-1000 + ((1000 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-              if (e.categoriah === 'Mayores' && e.beca === undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
-                }
+        setInterval(() => {
+          if (this.executed === false) {
+            console.log('hola')
+            this.players.forEach((e, i) => {
+              if (e.categoria === 'Activo Mayor (+18)' && e.actividad === 'Sin Actividad') {
                 e.pagos.push({debito: -1000, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
                 db.ref(`jugadores/${i}/pagos`).set(e.pagos)
               }
 
-              if (e.categoriah === 'Quinta' && e.beca !== undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
-                }
-                e.pagos.push({debito: (-650 + ((650 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-              if (e.categoriah === 'Quinta' && e.beca === undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
-                }
-                e.pagos.push({debito: -650, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+              if (e.categoria === 'Activo Cadete (14-17)' && e.actividad === 'Sin Actividad') {
+                e.pagos.push({debito: -1000, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
                 db.ref(`jugadores/${i}/pagos`).set(e.pagos)
               }
 
-              if (e.categoriah === 'Sexta' && e.beca !== undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
-                }
-                e.pagos.push({debito: (-600 + ((600 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-              if (e.categoriah === 'Sexta' && e.beca === undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
-                }
-                e.pagos.push({debito: -600, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+              if (e.categoria === 'Menor (-13)' && e.actividad === 'Sin Actividad') {
+                e.pagos.push({debito: -1000, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
                 db.ref(`jugadores/${i}/pagos`).set(e.pagos)
               }
 
-              if (e.categoriah === 'Septima' && e.beca !== undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+              if (e.actividad === 'Hockey') {
+                if (e.categoriah === 'Mayores' && e.beca !== undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: (-1000 + ((1000 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
                 }
-                e.pagos.push({debito: (-600 + ((600 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-              if (e.categoriah === 'Septima' && e.beca === undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                if (e.categoriah === 'Mayores' && e.beca === undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: -1000, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
                 }
-                e.pagos.push({debito: -600, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+
+                if (e.categoriah === 'Quinta' && e.beca !== undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: (-650 + ((650 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+                if (e.categoriah === 'Quinta' && e.beca === undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: -650, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+
+                if (e.categoriah === 'Sexta' && e.beca !== undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: (-600 + ((600 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+                if (e.categoriah === 'Sexta' && e.beca === undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: -600, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+
+                if (e.categoriah === 'Septima' && e.beca !== undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: (-600 + ((600 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+                if (e.categoriah === 'Septima' && e.beca === undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -200, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: -600, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+
+                if (e.categoriah === 'Octava' && e.beca !== undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: (-550 + ((550 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+                if (e.categoriah === 'Octava' && e.beca === undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: -550, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+
+                if (e.categoriah === 'Novena' && e.beca !== undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: (-450 + ((450 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+                if (e.categoriah === 'Novena' && e.beca === undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: -450, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+
+                if (e.categoriah === 'Decima' && e.beca !== undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: (-300 + ((300 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+                if (e.categoriah === 'Decima' && e.beca === undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: -300, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
+
+                if (e.categoriah === 'Jardin' && e.beca !== undefined) {
+                  if (this.month !== 'Enero') {
+                    e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                  }
+                  e.pagos.push({debito: (-100 + ((100 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
+                }
               }
 
-              if (e.categoriah === 'Octava' && e.beca !== undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+              if (e.actividad === 'Futbol') {
+                if (e.categoriaf === 'Jardin' && e.becaf !== undefined) {
+                  e.pagos.push({debito: (-450 + ((450 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social Futbol'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
                 }
-                e.pagos.push({debito: (-550 + ((550 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-              if (e.categoriah === 'Octava' && e.beca === undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                if (e.categoriaf === 'Jardin' && e.becaf === undefined) {
+                  e.pagos.push({debito: -450, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social Futbol'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
                 }
-                e.pagos.push({debito: -550, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
 
-              if (e.categoriah === 'Novena' && e.beca !== undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                if (e.categoriaf !== 'Jardin' && e.becaf !== undefined) {
+                  e.pagos.push({debito: (-600 + ((600 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social Futbol'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
                 }
-                e.pagos.push({debito: (-450 + ((450 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-              if (e.categoriah === 'Novena' && e.beca === undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
+                if (e.categoriaf !== 'Jardin' && e.becaf === undefined) {
+                  e.pagos.push({debito: -600, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social Futbol'})
+                  db.ref(`jugadores/${i}/pagos`).set(e.pagos)
                 }
-                e.pagos.push({debito: -450, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
               }
-
-              if (e.categoriah === 'Decima' && e.beca !== undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
-                }
-                e.pagos.push({debito: (-300 + ((300 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-              if (e.categoriah === 'Decima' && e.beca === undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
-                }
-                e.pagos.push({debito: -300, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-
-              if (e.categoriah === 'Jardin' && e.beca !== undefined) {
-                if (this.month !== 'Enero') {
-                  e.pagos.push({debito: -150, monto: 0, dia: this.date, mes: this.month, descripcion: 'Adicional Hockey'})
-                }
-                e.pagos.push({debito: (-100 + ((100 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-            }
-
-            if (e.actividad === 'Futbol') {
-              if (e.categoriaf === 'Jardin' && e.becaf !== undefined) {
-                e.pagos.push({debito: (-450 + ((450 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social Futbol'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-              if (e.categoriaf === 'Jardin' && e.becaf === undefined) {
-                e.pagos.push({debito: -450, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social Futbol'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-
-              if (e.categoriaf !== 'Jardin' && e.becaf !== undefined) {
-                e.pagos.push({debito: (-600 + ((600 * parseInt(e.beca)) / 100)), monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social Futbol'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-              if (e.categoriaf !== 'Jardin' && e.becaf === undefined) {
-                e.pagos.push({debito: -600, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social Futbol'})
-                db.ref(`jugadores/${i}/pagos`).set(e.pagos)
-              }
-            }
-          })
-          this.executed = true
-        }
+            })
+            this.executed = true
+          }
+        }, 30000)
       })
     }
   }

@@ -96,10 +96,12 @@ export default {
       nombre: '',
       apellido: '',
       showModal: false,
-      recibo: null
+      recibo: null,
+      superuser: false
     }
   },
   created () {
+    if (firebase.auth().currentUser.uid === 'tkaqGAGYoKTxUb3sAN8FruUGsxB3') this.superuser = true
     db.ref('recibo').once('value').then((snapshot) => {
       this.recibo = snapshot.val() + 1
     })
@@ -126,14 +128,18 @@ export default {
       db.ref(`jugadores/${id}`).once('value').then((snapshot) => {
         this.player = snapshot.val()
         this.player.pagos.forEach((e, i) => {
-          e.new = false
+          if (this.superuser === true) {
+            e.new = true
+          } else {
+            e.new = false
+          }
         })
       })
     },
     addRow () {
+      this.recibo += 1
       this.player.pagos.push({mes: null, monto: 0, dia: null, debito: 0, recibo: this.recibo, new: true})
       this.one += 1
-      this.recibo += 1
       if (this.one !== 1) {
         this.showlastremove = true
       }
@@ -153,12 +159,19 @@ export default {
       let id = this.$route.params.id
       db.ref(`jugadores/${id}/pagos`).set(this.player.pagos)
       db.ref('recibo').set(this.recibo)
-      this.player.pagos.forEach(e => {
-        e.new = false
-      })
       this.showModal = true
       this.show = !this.show
       this.newpay = !this.newpay
+      this.player.pagos.forEach(e => {
+        if (this.superuser === true) {
+          e.new = true
+        } else {
+          e.new = false
+        }
+      })
+      db.ref('recibo').once('value').then((snapshot) => {
+        this.recibo = snapshot.val() + 1
+      })
     },
     toggle () {
       this.show = !this.show

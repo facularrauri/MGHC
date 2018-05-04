@@ -8,12 +8,12 @@
     p.menu-label Arboles
     ul.menu-list
       li
-        a Administrar Jugadores
+        a Administrar Socios
         ul
           li
-            router-link(to="/players") Listado de Jugadores
+            router-link(to="/players") Listado de Socios
           li
-            router-link(to="/entry/create/new") Nuevo Jugador
+            router-link(to="/entry/create/new") Nuevo Socio
 </template>
 
 <style lang="scss" scoped>
