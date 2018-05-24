@@ -34,9 +34,12 @@ export default {
   },
   mounted () {
     setInterval(() => {
-      console.log('hola desde mounted')
-      if (new Date().getDate() === 4 && new Date().getMinutes() === 52 && new Date().getHours() === 16) this.executed = false
-    }, 30000)
+      if (new Date().getDate() === 28 && new Date().getMinutes() === 0 && new Date().getHours() === 12) {
+        this.executed = false
+        console.log('DEBITO')
+      }
+      console.log('hola')
+    }, 31000)
     this.getAllPlayers()
   },
   methods: {
@@ -45,7 +48,6 @@ export default {
         this.players = snapshot.val()
         setInterval(() => {
           if (this.executed === false) {
-            console.log('hola')
             this.players.forEach((e, i) => {
               if (e.categoria === 'Activo Mayor (+18)' && e.actividad === 'Sin Actividad') {
                 e.pagos.push({debito: -1000, monto: 0, dia: this.date, mes: this.month, descripcion: 'Cuota Social'})
@@ -199,7 +201,7 @@ export default {
             })
             this.executed = true
           }
-        }, 30000)
+        }, 31000)
       })
     }
   }

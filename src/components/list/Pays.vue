@@ -101,7 +101,7 @@ export default {
     }
   },
   created () {
-    if (firebase.auth().currentUser.uid === 'tkaqGAGYoKTxUb3sAN8FruUGsxB3') this.superuser = true
+    if (firebase.auth().currentUser.uid === 'tkaqGAGYoKTxUb3sAN8FruUGsxB3' || firebase.auth().currentUser.uid === 'W1rQnZh9NjMdDIL1Ev6UYC4G9793') this.superuser = true
     db.ref('recibo').once('value').then((snapshot) => {
       this.recibo = snapshot.val() + 1
     })

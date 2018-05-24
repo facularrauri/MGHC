@@ -49,8 +49,16 @@ export default {
           this.isLoading = true
           this.$router.push({ name: 'dashboard' })
         })
-        .catch(err => {
-          console.log(err)
+        .catch(() => {
+          this.$dialog.alert({
+            title: 'Error',
+            message: 'Usuario o contraseña incorrectos, intente de nuevo',
+            type: 'is-danger',
+            hasIcon: true,
+            icon: 'times-circle',
+            iconPack: 'fa'
+          })
+          this.isLoading = false
         })
     }
   }
