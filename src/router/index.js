@@ -4,12 +4,14 @@ import Main from '@/components/Main'
 import Dashboard from '@/components/dashboard/Dashboard'
 import EntryCreate from '@/components/entry/EntryCreate'
 import Login from '@/components/public/Login'
-import ListPlayers from '@/components/list/ListPlayers'
-import Pays from '@/components/list/Pays'
+import PlayersList from '@/components/list/PlayersList'
+import PaysList from '@/components/list/PaysList'
+
+import navigationGuard from './navigation-guard'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/login',
@@ -30,19 +32,23 @@ export default new Router({
         {
           path: '/pay/:id',
           name: 'pays',
-          component: Pays
+          component: PaysList
         },
         {
-          path: '/entry/create/:id',
+          path: '/entry/:id',
           name: 'entry-create',
           component: EntryCreate
         },
         {
           path: '/players',
           name: 'list-players',
-          component: ListPlayers
+          component: PlayersList
         }
       ]
     }
   ]
 })
+
+router.beforeEach(navigationGuard)
+
+export default router

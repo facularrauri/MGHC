@@ -12,7 +12,6 @@
 </template>
 
 <script>
-import firebase from '../../firebase'
 export default {
   name: 'Menu',
   data () {
@@ -22,14 +21,8 @@ export default {
   },
   methods: {
     singOut () {
-      firebase.auth().signOut()
-        .then(() => {
-          localStorage.removeItem('token')
-          localStorage.removeItem('email')
-
-          this.$router.push({name: 'login'})
-        })
-        .catch(err => console.log(err))
+      localStorage.removeItem('token')
+      this.$router.push({name: 'login'})
     },
     toggleNav () {
       this.showNav = !this.showNav

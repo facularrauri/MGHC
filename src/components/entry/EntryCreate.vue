@@ -1,55 +1,62 @@
 <template lang="pug">
-  div
-    .modal(v-if="newEntry.nombre !== null && newEntry.apellido !== null", :class="{'is-active': showModal}")
+  div(v-if="newEntry")
+    .modal(v-if="newEntry.nombre && newEntry.apellido", :class="{'is-active': showModal}")
       .modal-background
       .modal-content
         .notification.has-text-centered
            button.delete(@click="toggleModal")
-           p El socio <strong>{{newEntry.nombre.charAt(0).toUpperCase() + newEntry.nombre.slice(1)}} {{newEntry.apellido.charAt(0).toUpperCase() + newEntry.apellido.slice(1)}}</strong> se ha creado correctamente.
-
-    .level
-      .level-left
-        .level-item
-          h1.title Nueva entrada
+           p El socio <strong>{{newEntry.nombre.charAt(0).toUpperCase() + newEntry.nombre.slice(1)}} {{newEntry.apellido.charAt(0).toUpperCase() + newEntry.apellido.slice(1)}}</strong> se ha {{ modalMsg }} correctamente.
 
     .columns
-      .column.is-9
+      .column.is-9.is-offset-1
+        .level
+          .level-left
+            .level-item
+              h1.title Nueva entrada
         form
           .field.is-horizontal
             .field-body
+
               .field
                 .control
-                  input.input(:class="[!name ? 'is-danger' : '']", type="text", v-model="newEntry.nombre" placeholder="Nombre")
-                  p(v-if="!name" class="danger") {{noName}}
+                  input.input(:class="[errors.has('nombre') ? 'is-danger' : '']" v-validate="'required|alpha'", type="text" v-model="newEntry.nombre" placeholder="Nombre" name="nombre")
+                  p(v-show="errors.has('nombre')" class="help is-danger") {{ errors.first('nombre') }}
+
               .field
                 .control
-                  input.input(:class="[!lastname ? 'is-danger' : '']", type="text" v-model="newEntry.apellido" placeholder="Apellido")
-                  p(v-if="!lastname" class="danger") {{noLastName}}
+                  input.input(:class="[errors.has('apellido') ? 'is-danger' : '']" v-validate="'required|alpha'" type="text" v-model="newEntry.apellido" placeholder="Apellido" name="apellido")
+                  p(v-show="errors.has('apellido')" class="help is-danger") {{ errors.first('apellido') }}
           .field.is-horizontal
             .field-body
+
               .field
                 .control
-                  input.input(type="number", v-model="newEntry.socio" placeholder="Numero de socio" disabled)
+                  input.input(v-model.number="newEntry.socio_id" placeholder="Numero de socio" disabled)
+
           label.label Categoria
           .field.is-horizontal
             .field-body
+
               .field
                 .control
                   .select
-                    select(:class="[categoria ? 'selectdanger' : '']", v-model="newEntry.categoria")
-                      option Activo Mayor (+18)
-                      option Activo Cadete (14-17)
-                      option Menor (-13)
+                    select(name="categoria" :class="[errors.has('categoria') ? 'selectdanger' : '']" v-validate="'required'" v-model="newEntry.categoria")
+                      option Activo Mayor
+                      option Activo Cadete
+                      option Menor
                       option Vitalicio
                       option Honorario
                       option Licencia
-                p(v-if="categoria" class="danger") {{InvalidCategoria}}
+                  p(v-show="errors.has('categoria')" class="help is-danger") {{ errors.first('categoria') }}
+
           .field.is-horizontal(v-if="newEntry.categoria === 'Licencia'")
             .field-body
+
               .field
                 .control
                   label.label Inicio de Licencia
                   input.input(type="date", v-model="newEntry.licenciainicio" placeholder="Inicio de Licencia")
+
               .field
                 .control
                   label.label Fin de Licencia
@@ -59,52 +66,63 @@
           label.label Datos Personales
           .field.is-horizontal
             .field-body
+
               .field
                 .control
-                  input.input(:class="[!email ? 'is-danger' : '']", type="email", v-model="newEntry.email" placeholder="Mail")
-                  p(v-if="!email" class="danger") {{invalidEmail}}
+                  input.input(type="email", v-model="newEntry.mail" placeholder="Mail")
+
               .field
                 .control
-                  input.input(type="number", v-model="newEntry.dni" placeholder="DNI")
+                  input.input(name="dni" :class="[errors.has('dni') ? 'is-danger' : '']" v-validate="'required'" type="number", v-model.number="newEntry.dni" placeholder="DNI")
+                  p(v-show="errors.has('dni')" class="help is-danger") {{ errors.first('dni') }}
           .field
           .field.is-horizontal
             .field-body
+
               .field
                 .control
-                  input.input(type="tel", v-model="newEntry.celular" placeholder="Telefono Celular")
+                  input.input(type="tel", v-model="newEntry.telcel" placeholder="Telefono Celular")
+
               .field
                 .control
-                  input.input(type="tel" v-model="newEntry.telefono" placeholder="Telefono Particular")
+                  input.input(type="tel" v-model="newEntry.telpar" placeholder="Telefono Particular")
+
           .field
           .field.is-horizontal
             .field-body
+
               .field
                 .control
-                  input.input(type="tel", v-model="newEntry.celularpadre" placeholder="Telefono Madre")
+                  input.input(type="tel", v-model="newEntry.telpadre" placeholder="Telefono Madre")
+
               .field
                 .control
-                  input.input(type="tel", v-model="newEntry.celularmadre" placeholder="Telefono Padre")
+                  input.input(type="tel", v-model="newEntry.telmadre" placeholder="Telefono Padre")
           .field
           .field.is-horizontal
             .field-body
+
               .field
                 .control
                   input.input(type="text", v-model="newEntry.direccion" placeholder="Direccion")
+
               .field
                 .control
-                  input.input(:class="[!nacimiento ? 'is-danger' : '']", type="text", v-model="newEntry.nacimiento" placeholder="Fecha de Nacimiento")
-                  p(v-if="!nacimiento" class="danger") {{noNacimiento}}
+                  b-datepicker(class="selectdanger" name="nacimiento" :class="[errors.has('actividad') ? 'selectdanger' : '']" placeholder="Fecha de nacimiento"  v-validate="'required'" v-model="newEntry.nacimiento")
+                  p(v-show="errors.has('nacimiento')" class="help is-danger") {{ errors.first('nacimiento') }}
           .field.is-horizontal
             .field-body
+
               .field
                 label.label Fecha de Alta
                 .control
-                  input.input(:class="[!alta ? 'is-danger' : '']", type="date", v-model="newEntry.alta" placeholder="Fecha de Alta")
-                  p(v-if="!alta" class="danger") {{noFechaAlta}}
+                  b-datepicker(name="alta" :class="[errors.has('alta') ? 'selectdanger' : '']" placeholder="Fecha de alta"  v-validate="'required'" v-model="newEntry.fechaalta")
+                  p(v-show="errors.has('alta')" class="help is-danger") {{ errors.first('alta') }}
               .field
+                label.label Fecha de baja
                 .control
-                  label.label Fecha de baja
-                  input.input(type="date" v-model="newEntry.baja" placeholder="Fecha de Baja")
+                  b-datepicker(placeholder="Fecha de baja" v-model="newEntry.fechabaja")
+
           label.label Corbertura Medica
           .field
           .field.is-horizontal
@@ -114,378 +132,253 @@
                   input.input(type="text", v-model="newEntry.obrasocial" placeholder="Obral Social")
               .field
                 .control
-                  input.input(type="text", v-model="newEntry.nobrasocial" placeholder="Numero de Socio")
+                  input.input(type="text", v-model="newEntry.numobrasocial" placeholder="Numero de Socio")
 
           label.label Actividades
+          //- .field.is-horizontal
+          //-   .field-body
+          //-     .field
+          //-       .control
+          //-         .select
+          //-           select(name="actividad" :class="[errors.has('actividad') ? 'selectdanger' : '']" v-validate="'required'" v-model="newEntry.actividad")
+          //-             option Hockey
+          //-             option Futbol
+          //-             option Sin actividad
+          //-         p(v-show="errors.has('actividad')" class="help is-danger") {{ errors.first('actividad') }}
+
+          label.label Hockey
           .field.is-horizontal
             .field-body
               .field
                 .control
                   .select
-                    select(:class="[!actividad ? 'selectdanger' : '']", v-model="newEntry.actividad")
-                      option Hockey
-                      option Futbol
-                      option Sin Actividad
-                  p(v-if="!actividad" class="danger") {{noActividad}}
+                    select(v-model="newEntry.act_hockey")
+                      option Activo
+                      option Inactivo
 
-          .field(v-if="newEntry.actividad === 'Hockey'")
-            .field.is-horizontal
-              .field-body
-                .field
-                  .control
-                    label.label Tira
-                    .select
-                      select(:class="[tira ? 'selectdanger' : '']", v-model="newEntry.tira")
-                        option Damas
-                        option Caballeros
-                    p(v-if="tira" class="danger") {{InvalidTira}}
-                .field
-                  .control
-                    label.label Categoria
-                    .select
-                      select(:class="[categoriah ? 'selectdanger' : '']", v-model="newEntry.categoriah")
-                        option Mayores
-                        option Quinta
-                        option Sexta
-                        option Septima
-                        option Octava
-                        option Novena
-                        option Decima
-                        option Escuelita
-                  p(v-if="categoriah" class="danger") {{InvalidCategoria}}
+          hockey(v-if="newEntry.act_hockey === 'Activo'" :socio_id="newEntry.socio_id" :newEntry="newEntry.hockey" ref="hockey")
 
-            .field.is-horizontal
-              .field-body
-                .field
-                  .control
-                    input.input(type="number", v-model="newEntry.fichaje" placeholder="Numero de Fichaje")
-                .field
-                  .control
-                    input.input(type="number", v-model="newEntry.camisetah" placeholder="Numero de Camiseta")
-                .field
-                  .control
-                    input.input(type="number", v-model="newEntry.beca" placeholder="Beca %")
-            .field.is-horizontal
-                .field-body
-                  .field
-                    .control
-                      label.label Fecha de Alta
-                      input.input(:class="[!alta ? 'is-danger' : '']", type="date", v-model="newEntry.altahockey" placeholder="Fecha de Alta")
-                      p(v-if="!alta" class="danger") {{noFechaAlta}}
-                  .field
-                    .control
-                      label.label Fecha de Baja
-                      input.input(type="date", v-model="newEntry.bajahockey" placeholder="Fecha de Baja")
+          label.label Futbol
+          .field.is-horizontal
+            .field-body
+              .field
+                .control
+                  .select
+                    select(v-model="newEntry.act_futbol")
+                      option Activo
+                      option Inactivo
 
-          .field(v-if="newEntry.actividad === 'Futbol'")
-            .field.is-horizontal
-              .field-body
-                .field
-                  .control
-                    label.label Categoria
-                    .select
-                      select(:class="[!categoriaf ? 'selectdanger' : '']", v-model="newEntry.categoriaf")
-                        option Sub15
-                        option Sub11
-                        option Sub9
-                        option Jardin
-                    p(v-if="!categoriaf" class="danger") {{InvalidCategoria}}
-            .field.is-horizontal
-              .field-body
-                .field
-                  .control
-                    input.input(type="number", v-model="newEntry.camisetaf" placeholder="Numero de camiseta")
-                .field
-                  .control
-                    input.input(type="number", v-model="newEntry.becaf" placeholder="Beca %")
-            .field.is-horizontal
-                .field-body
-                  .field
-                    .control
-                      label.label Fecha de Alta
-                      input.input(type="date", v-model="newEntry.altafutbol" placeholder="Fecha de Alta")
-                  .field
-                    .control
-                      label.label Fecha de Baja
-                      input.input(type="date", v-model="newEntry.bajafutbol" placeholder="Fecha de Baja")
-          .field(v-if="!update")
-            label.label Pagos
-            p(v-if="!pagos" class="danger") {{Invalidpago}}
-            .field(v-for="(pago,i) in newEntry.pagos" :key="i")
-              .field
-              .field.is-horizontal
-                .field-body
-                  .field
-                    .control
-                      .select
-                        select(:class="[mes ? 'selectdanger' : '']", v-model="pago.mes")
-                          option Enero
-                          option Febrero
-                          option Marzo
-                          option Abril
-                          option Mayo
-                          option Junio
-                          option Julio
-                          option Agosto
-                          option Septiembre
-                          option Octubre
-                          option Noviembre
-                          option Diciembre
-                          option Otro
-                      button(v-if="showlastremove" @click.prevent="removeRow(i)") -
-              .field
-              .field.is-horizontal
-                .field-body
-                  .field
-                    .control
-                      label.label Credito
-                      input.input(:class="[monto ? 'is-danger' : '']", type="number", v-model="pago.monto" placeholder="Credito")
-                  .field
-                    .control
-                      label.label Fecha
-                      input.input(:class="[dia ? 'is-danger' : '']" ,type="date", v-model="pago.dia" placeholder="Dia")
-              .field
-              .field.is-horizontal
-                .field-body
-                  .field
-                    .control
-                      label.label Descripcion
-                      input.input(:class="[desc ? 'is-danger' : '']", type="text" placeholder="Descripcion" v-model="pago.descripcion")
-                  .field
-                    .control
-                      label.label Numero de recibo
-                      input.input(type="text" placeholder="Numero de recibo" v-model="pago.recibo" disabled)
-              p(v-if="campos" class="danger") {{InvalidCampos}}
-            button(@click.prevent="addRow") +
+          futbol(v-if="newEntry.act_futbol === 'Activo'" :socio_id="newEntry.socio_id" :newEntry="newEntry.futbol" ref="futbol")
+
+          pays(v-if="!update" :newEntry="newEntry" @addRow="addRow" ref="pays")
+
           .field.is-horizontal
             .field-label.is-normal
               .field-body
                 .field
                   .control
-                    button.is-link.button(@click.prevent="addEntry") Guardar Jugador
+                    button.is-link.button(@click.prevent="addEntry") {{ entryButton }}
 </template>
 
 <script>
-import firebase from '@/firebase'
+import Hockey from './Hockey.vue'
+import Futbol from './Futbol.vue'
+import Pays from './Pays.vue'
 
-const db = firebase.database()
+import sociosService from '@/services/socios'
+
 export default {
   name: 'EntryCreate',
-
+  components: {
+    Hockey,
+    Futbol,
+    Pays
+  },
   data () {
     return {
       newEntry: {
-        pagos: [],
-        nombre: null,
-        apellido: null
+        socio_id: null,
+        hockey: {},
+        futbol: {},
+        pays: [],
+        act_futbol: 'Inactivo',
+        act_hockey: 'Inactivo'
       },
       socio: '',
-      name: true,
-      email: true,
-      lastname: true,
-      errors: [],
-      pagos: true,
-      campos: false,
-      showlastremove: false,
-      one: 0,
-      tira: false,
-      categoria: false,
-      mes: false,
-      monto: false,
-      dia: false,
-      showModal: false,
-      nacimiento: true,
-      alta: true,
-      actividad: true,
-      recibo: null,
-      desc: false,
       update: false,
-      categoriah: false,
-      categoriaf: false
+      showModal: false,
+      newActivity: false,
+      newHockey: false,
+      newFutbol: false
     }
+  },
+  provide () {
+    return { $validator: this.$validator }
+  },
+  beforeRouteUpdate (to, from, next) {
+    sociosService.getLastId()
+      .then(res => {
+        this.newEntry = {
+          socio_id: res.socio_id + 1,
+          hockey: {},
+          futbol: {},
+          pays: [],
+          act_futbol: 'Inactivo',
+          act_hockey: 'Inactivo'
+        }
+        this.update = false
+        this.$validator.reset()
+      })
+      .catch(err => {
+        if (err.data.message === 'Auth failed') {
+          localStorage.removeItem('token')
+          this.$router.push('/login')
+        }
+      })
+    next()
   },
   created () {
     this.Players()
-    db.ref('jugadores').orderByChild('socio').limitToLast(1).on('child_added', (data) => {
-      this.newEntry.socio = (parseInt(data.val().socio) + 1)
-    })
-    db.ref('recibo').once('value').then((snapshot) => {
-      this.recibo = snapshot.val() + 1
-    })
+    this.getLastId()
   },
-  beforeRouteUpdate (to, from, next) {
-    db.ref('jugadores').orderByChild('socio').limitToLast(1).on('child_added', (data) => {
-      this.newEntry = {
-        pagos: [],
-        nombre: null,
-        apellido: null,
-        socio: (parseInt(data.val().socio) + 1)
-      }
-      this.update = false
-    })
-    next()
-  },
-  methods: {
-    addEntry () {
-      this.desc = false
-      this.actividad = true
-      this.nacimiento = true
-      this.alta = true
-      this.errors = []
-      this.name = true
-      this.lastname = true
-      this.email = true
-      this.pagos = true
-      this.campos = false
-      this.tira = false
-      this.categoria = false
-      this.mes = false
-      this.dia = false
-      this.monto = false
-      this.categoriah = false
-      this.categoriaf = false
-      if (!this.newEntry.actividad) {
-        this.actividad = false
-        this.errors.push('Error falta actividad')
-      }
-      if (!this.newEntry.alta) {
-        this.alta = false
-        this.errors.push('Error fecha de alta')
-      }
-      if (!this.newEntry.nacimiento) {
-        this.nacimiento = false
-        this.errors.push('Error nacimiento')
-      }
-      if (this.newEntry.actividad === 'Hockey' && !this.newEntry.tira) {
-        this.tira = true
-        this.errors.push('error')
-      }
-      if (this.newEntry.actividad === 'Hockey' && !this.newEntry.categoriah) {
-        this.categoriah = true
-        this.errors.push('error categoria hockey')
-      }
-      if (this.newEntry.actividad === 'Futbol' && !this.newEntry.categoriaf) {
-        this.categoriaf = true
-        this.errors.push('error categoria futbol')
-      }
-      if (!this.newEntry.categoria) {
-        this.categoria = true
-        this.errors.push('error categoria')
-      }
-      if (!this.newEntry.nombre) {
-        this.name = false
-        this.errors.push('error nombre')
-      }
-      if (!this.newEntry.apellido) {
-        this.lastname = false
-        this.errors.push('error apellido')
-      }
-      if (this.newEntry.email === undefined || this.newEntry.email === '') {
-        this.email = true
-      } else if (!this.validEmail(this.newEntry.email)) {
-        this.email = false
-        this.errors.push('Error validacion de mail')
-      }
-
-      if (!this.newEntry.pagos.length) {
-        this.pagos = false
-        this.errors.push('error falta pago')
-      } else if (!this.newEntry.pagos[0].descripcion || !this.newEntry.pagos[0].mes || !this.newEntry.pagos[0].monto || !this.newEntry.pagos[0].dia) {
-        this.campos = true
-        this.errors.push('error completar campos de pago')
-      }
-
-      if (!this.newEntry.pagos[0].mes) this.mes = true
-      if (!this.newEntry.pagos[0].monto) this.monto = true
-      if (!this.newEntry.pagos[0].dia) this.dia = true
-      if (!this.newEntry.pagos[0].descripcion) this.desc = true
-
-      if (!this.errors.length) {
-        db.ref(`jugadores/${this.newEntry.socio}`).set(this.newEntry)
-        db.ref(`jugadores/${this.newEntry.socio}/pagos`).set(this.newEntry.pagos)
-        db.ref('recibo').set(this.recibo)
-        this.showModal = true
+  watch: {
+    'newEntry.act_hockey' (newVal, oldVal) {
+      if (newVal === 'Activo' && Object.entries(this.newEntry.hockey).length === 0 && this.newEntry.hockey.constructor === Object) {
+        this.newHockey = true
+      } else {
+        this.newHockey = false
       }
     },
-    validEmail (email) {
-      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      return re.test(email)
+    'newEntry.act_futbol' (newVal, oldVal) {
+      if (newVal === 'Activo' && Object.entries(this.newEntry.futbol).length === 0 && this.newEntry.futbol.constructor === Object) {
+        this.newFutbol = true
+      } else {
+        this.newFutbol = false
+      }
+    }
+  },
+  methods: {
+    getLastId () {
+      sociosService.getLastId()
+        .then(res => {
+          if (!res && this.$route.params.id === 'new') this.newEntry.socio_id = 1
+          if (res && this.$route.params.id === 'new') this.newEntry.socio_id = res.socio_id + 1
+        })
+        .catch(err => {
+          if (err.data.message === 'Auth failed') {
+            localStorage.removeItem('token')
+            this.$router.push('/login')
+          }
+        })
+    },
+    addEntry () {
+      this.$validator.validateAll()
+        .then((result) => {
+          if (result) {
+            if (this.update) {
+              sociosService.update(this.newEntry)
+                .then(res => {
+                  this.showModal = true
+                })
+                .catch(err => {
+                  if (err.data.message === 'Auth failed') {
+                    localStorage.removeItem('token')
+                    this.$router.push('/login')
+                  }
+                })
+              if (this.newEntry.act_hockey === 'Activo') {
+                if (this.newHockey) {
+                  this.$refs.hockey.addHockeyPlayer()
+                  this.newHockey = false
+                } else {
+                  this.$refs.hockey.updateHockeyPlayer()
+                }
+              }
+              if (this.newEntry.act_futbol === 'Activo') {
+                if (this.newFutbol) {
+                  this.$refs.futbol.addFutbolPlayer()
+                  this.newFutbol = false
+                } else {
+                  this.$refs.futbol.updateFutbolPlayer()
+                }
+              }
+            } else {
+              sociosService.create(this.newEntry)
+                .then(res => {
+                  this.showModal = true
+                })
+                .catch(err => {
+                  if (err.data.message === 'Auth failed') {
+                    localStorage.removeItem('token')
+                    this.$router.push('/login')
+                  }
+                })
+              if (this.newEntry.act_hockey === 'Activo') this.$refs.hockey.addHockeyPlayer()
+
+              if (this.newEntry.act_futbol === 'Activo') this.$refs.futbol.addFutbolPlayer()
+              this.$refs.pays.addPays()
+            }
+          }
+        })
+        .catch(err => console.log(err))
+    },
+    addRow (data) {
+      this.newEntry.pays.push({recibo: data})
     },
     toggleModal () {
       if (this.$route.params.id === 'new') {
         this.showModal = !this.showModal
         this.newEntry = {
-          nombre: null,
-          apellido: null,
-          pagos: []
+          socio_id: this.newEntry.socio_id + 1,
+          hockey: {},
+          futbol: {},
+          pays: [],
+          act_futbol: 'Inactivo',
+          act_hockey: 'Inactivo'
         }
+        this.$validator.reset()
       } else {
         this.showModal = !this.showModal
-      }
-    },
-    addRow () {
-      this.newEntry.pagos.push({mes: null, monto: 0, dia: null, debito: 0, recibo: this.recibo})
-      this.recibo += 1
-      this.pagos = true
-      this.one += 1
-      if (this.one === 0) {
-        this.showlastremove = false
-      } else {
-        this.showlastremove = true
-      }
-    },
-    removeRow (i) {
-      this.newEntry.pagos.splice(i, 1)
-      this.recibo -= 1
-      this.one -= 1
-      if (this.one === 0) {
-        this.showlastremove = false
-      } else {
-        this.showlastremove = true
       }
     },
     Players () {
       if (this.$route.params.id !== 'new') {
         this.update = true
-        let id = this.$route.params.id
-        db.ref(`jugadores/${id}`).once('value').then((snapshot) => {
-          this.newEntry = snapshot.val()
-        })
+        const id = this.$route.params.id
+        sociosService.getById(id)
+          .then(socio => {
+            this.newEntry = socio
+            if (!this.newEntry.hockey) this.newEntry.hockey = {}
+            if (!this.newEntry.futbol) this.newEntry.futbol = {}
+            this.newEntry.fechaalta = new Date(socio.fechaalta)
+            this.newEntry.nacimiento = new Date(socio.nacimiento)
+            if (this.newEntry.fechabaja) this.newEntry.fechabaja = new Date(socio.fechabaja)
+            if (this.newEntry.licenciainicio) this.newEntry.licenciainicio = new Date(socio.licenciainicio)
+            if (this.newEntry.licenciafin) this.newEntry.licenciafin = new Date(socio.licenciafin)
+            if (this.newEntry.hockey.fecha_alta) this.newEntry.hockey.fecha_alta = new Date(socio.hockey.fecha_alta)
+            if (this.newEntry.hockey.fecha_baja) this.newEntry.hockey.fecha_baja = new Date(socio.hockey.fecha_baja)
+            if (this.newEntry.futbol.fecha_altaf) this.newEntry.futbol.fecha_altaf = new Date(socio.futbol.fecha_altaf)
+            if (this.newEntry.futbol.fecha_bajaf) this.newEntry.futbol.fecha_bajaf = new Date(socio.futbol.fecha_bajaf)
+          })
+          .catch(err => {
+            if (err.data.message === 'Auth failed') {
+              localStorage.removeItem('token')
+              this.$router.push('/login')
+            }
+          })
       } else {
         this.update = false
       }
     }
   },
   computed: {
-    noActividad () {
-      if (!this.actividad) return 'Debe ingresar una actividad'
+    entryButton () {
+      if (!this.update) return 'Guardar Socio'
+      return 'Actualizar Socio'
     },
-    noFechaAlta () {
-      if (!this.alta) return 'Debe ingresar fecha de alta'
-    },
-    noNacimiento () {
-      if (!this.nacimiento) return 'Debe ingresar fecha de nacimiento'
-    },
-    noName () {
-      if (!this.name) return 'Debe ingresar un nombre'
-    },
-    noLastName () {
-      if (!this.lastname) return 'Debe ingresar un apellido'
-    },
-    invalidEmail () {
-      if (!this.email) return 'El formato del email no es correcto'
-    },
-    Invalidpago () {
-      if (!this.pagos) return 'Debe ingresar un pago'
-    },
-    InvalidCampos () {
-      if (this.campos) return 'Todos los campos son obligatorios'
-    },
-    InvalidTira () {
-      if (this.tira) return 'Debe ingresar Tira'
-    },
-    InvalidCategoria () {
-      if (this.categoria) return 'Debe ingresar Categoria'
+    modalMsg () {
+      if (!this.update) return 'creado'
+      return 'actualizado'
     }
   }
 }
@@ -495,7 +388,8 @@ export default {
 .danger {
   color: #ff3860;
 }
+
 .selectdanger {
-  border-color: #ff3860;
+  border-color: #ff3860 !important;
 }
 </style>

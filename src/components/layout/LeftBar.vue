@@ -13,7 +13,7 @@
           li
             router-link(to="/players") Listado de Socios
           li
-            router-link(to="/entry/create/new") Nuevo Socio
+            router-link(:to="{ name: 'entry-create', params: { id: 'new' }}") Nuevo Socio
 </template>
 
 <style lang="scss" scoped>

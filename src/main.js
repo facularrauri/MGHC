@@ -6,23 +6,19 @@ import router from './router'
 
 import Buefy from 'buefy'
 
+import es from 'vee-validate/dist/locale/es'
+import VeeValidate from 'vee-validate'
+
+Vue.use(VeeValidate, {
+  locale: 'es',
+  dictionary: {
+    es: es
+  }
+})
+
 Vue.use(Buefy)
 
 Vue.config.productionTip = false
-
-const isAuthenticated = function () {
-  return window.localStorage.token
-}
-
-router.beforeEach((to, from, next) => {
-  if (!to.meta.isPublic && !isAuthenticated()) {
-    return next({ name: 'login' })
-  }
-  if (to.name === 'login' && isAuthenticated()) {
-    return next({ name: 'main' })
-  }
-  return next()
-})
 
 /* eslint-disable no-new */
 new Vue({

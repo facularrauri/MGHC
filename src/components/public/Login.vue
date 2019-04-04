@@ -15,7 +15,7 @@
               form(@submit.prevent="login")
                 .field
                   .control
-                    input.input(type="email", placeholder="Email", autofocus, v-model="email")
+                    input.input(placeholder="Usuario", autofocus, v-model="username")
                 .field
                   .control
                     input.input(type="password", placeholder="Contraseña", v-model="password")
@@ -23,13 +23,13 @@
 </template>
 
 <script>
-import firebase from '@/firebase'
+import authService from '@/services/auth'
 
 export default {
 
   data () {
     return {
-      email: '',
+      username: '',
       password: '',
 
       isLoading: false
@@ -40,19 +40,17 @@ export default {
     login () {
       this.isLoading = true
 
-      firebase.auth()
-        .signInWithEmailAndPassword(this.email, this.password)
+      authService.authenticate(this.username, this.password)
         .then((res) => {
-          localStorage.setItem('token', res.refreshToken)
-          localStorage.setItem('email', res.email)
-
-          this.isLoading = true
+          localStorage.setItem('token', res.token)
           this.$router.push({ name: 'dashboard' })
+          this.isLoading = false
         })
-        .catch(() => {
+        .catch((err) => {
+          console.log(err)
           this.$dialog.alert({
             title: 'Error',
-            message: 'Usuario o contraseña incorrectos, intente de nuevo',
+            message: err.Error,
             type: 'is-danger',
             hasIcon: true,
             icon: 'times-circle',

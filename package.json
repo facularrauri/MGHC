@@ -12,11 +12,13 @@
     "serve": "serve --single"
   },
   "dependencies": {
-    "buefy": "^0.6.3",
+    "buefy": "^0.6.7",
     "bulma": "^0.6.2",
     "chart.js": "^2.7.2",
     "firebase": "^4.8.2",
     "serve": "^6.5.3",
+    "trae": "^1.4.2",
+    "vee-validate": "^2.1.7",
     "vue": "^2.5.2",
     "vue-chartjs": "^3.2.1",
     "vue-router": "^3.0.1"
@@ -72,7 +74,7 @@
     "webpack-merge": "^4.1.0"
   },
   "engines": {
-    "node": ">= 6.0.0",
+    "node": ">= 8.11.1",
     "npm": ">= 3.0.0"
   },
   "browserslist": [

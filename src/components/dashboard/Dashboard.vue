@@ -1,49 +1,30 @@
 <template lang="pug">
     div
-      bar-chart(:chart-data="datacollection", :options="{responsive: true, maintainAspectRatio: false}")
+      bar-chart(v-if="loaded" :chart-data="datacollection", :options="{responsive: true, maintainAspectRatio: false}")
 </template>
 
 <script>
-import firebase from '@/firebase'
-import BarChart from './chart.js'
+import payService from '@/services/pay'
 
-const db = firebase.database()
+import BarChart from './chart.js'
 
 export default {
   name: 'dashboard',
   data () {
     return {
       datacollection: null,
-      months: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      months: [],
       executed: false,
-      players: {}
+      players: {},
+      loaded: false
     }
   },
   components: {
     BarChart
   },
   mounted () {
-    this.months.forEach(e => { e = 0 })
-    db.ref('jugadores').once('value')
-      .then(data => {
-        data.val().forEach(e => {
-          e.pagos.forEach(e => {
-            if (e.mes === 'Enero') this.months[0] += parseInt(e.monto)
-            if (e.mes === 'Febrero') this.months[1] += parseInt(e.monto)
-            if (e.mes === 'Marzo') this.months[2] += parseInt(e.monto)
-            if (e.mes === 'Abril') this.months[3] += parseInt(e.monto)
-            if (e.mes === 'Mayo') this.months[4] += parseInt(e.monto)
-            if (e.mes === 'Junio') this.months[5] += parseInt(e.monto)
-            if (e.mes === 'Julio') this.months[6] += parseInt(e.monto)
-            if (e.mes === 'Agosto') this.months[7] += parseInt(e.monto)
-            if (e.mes === 'Septiembre') this.months[8] += parseInt(e.monto)
-            if (e.mes === 'Octubre') this.months[9] += parseInt(e.monto)
-            if (e.mes === 'Noviembre') this.months[10] += parseInt(e.monto)
-            if (e.mes === 'Diciembre') this.months[11] += parseInt(e.monto)
-            this.fillData()
-          })
-        })
-      })
+    this.fillData()
+    this.getTotals()
   },
   methods: {
     fillData () {
@@ -58,6 +39,39 @@ export default {
           }
         ]
       }
+    },
+    getTotals () {
+      this.loaded = false
+      payService.getMonthTotal('enero')
+        .then(res => { this.months[0] = res[0].total })
+        .catch(err => {
+          if (err.data.message === 'Auth failed') {
+            localStorage.removeItem('token')
+            this.$router.push('/login')
+          }
+        })
+      payService.getMonthTotal('febrero')
+        .then(res => { this.months[1] = res[0].total })
+      payService.getMonthTotal('marzo')
+        .then(res => { this.months[2] = res[0].total })
+      payService.getMonthTotal('abril')
+        .then(res => { this.months[3] = res[0].total })
+      payService.getMonthTotal('mayo')
+        .then(res => { this.months[4] = res[0].total })
+      payService.getMonthTotal('junio')
+        .then(res => { this.months[5] = res[0].total })
+      payService.getMonthTotal('julio')
+        .then(res => { this.months[6] = res[0].total })
+      payService.getMonthTotal('agosto')
+        .then(res => { this.months[7] = res[0].total })
+      payService.getMonthTotal('septiembre')
+        .then(res => { this.months[8] = res[0].total })
+      payService.getMonthTotal('octubre')
+        .then(res => { this.months[9] = res[0].total })
+      payService.getMonthTotal('noviembre')
+        .then(res => { this.months[10] = res[0].total })
+      payService.getMonthTotal('diciembre')
+        .then(res => { this.months[11] = res[0].total; this.loaded = true })
     }
   }
 }

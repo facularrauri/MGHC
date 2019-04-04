@@ -5,7 +5,7 @@
       .columns
         .column.is-2
           ar-left-bar
-        .column.is-1
+
         .column
           router-view
 </template>
